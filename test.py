@@ -84,9 +84,9 @@ tickets.insert(0, "id", range(1, 1+len(tickets)))
 db = sqlite3.connect("stadiums.sqlite")
 
 # Create connection engine
-engine = sqlalchemy.create_engine("sqlite:///stadiums.sqlite")
+#engine = sqlalchemy.create_engine("sqlite:///stadiums.sqlite")
 
-with engine.connect() as conn:
+#with db.cursor() as cur:
 
     # Enable Spatialite
     # conn.execute(text("PRAGMA trusted_schema = 1;"))
@@ -103,53 +103,66 @@ with engine.connect() as conn:
     # conn.execute(text(
     #     """
     #     CREATE TABLE IF NOT EXISTS "clubs" (
-    #         "club_id" INTEGER NOT NULL UNIQUE,
-    #         "name" TEXT NOT NULL,
-    #         "established" TEXT,
-    #         PRIMARY KEY("club_id")
-    #     );
+        #     "club_id" INTEGER NOT NULL UNIQUE,
+        #     "name" TEXT NOT NULL,
+        #     "established" TEXT,
+        #     PRIMARY KEY("club_id")
+        # );
 
-    #     CREATE TABLE IF NOT EXISTS "stadiums" (
-    #         "stadium_id" INTEGER NOT NULL UNIQUE,
-    #         "name" TEXT NOT NULL,
-    #         "peak_capacity" INTEGER,
-    #         "current_capacity" INTEGER,
-    #         "club_id" INTEGER,
-    #         "opened" TEXT,
-    #         "closed" TEXT,
-    #         "longitude" NUMERIC,
-    #         "latitude" NUMERIC,
-    #         PRIMARY KEY("stadium_id"),
-    #         FOREIGN KEY ("club_id") REFERENCES "clubs"("club_id")
-    #         ON UPDATE CASCADE ON DELETE NO ACTION
-    #     );
+        # CREATE TABLE IF NOT EXISTS "stadiums" (
+        #     "stadium_id" INTEGER NOT NULL UNIQUE,
+        #     "name" TEXT NOT NULL,
+        #     "capacity" INTEGER,
+        #     "club_id" INTEGER,
+        #     "opened" TEXT,
+        #     "closed" TEXT,
+        #     "longitude" NUMERIC,
+        #     "latitude" NUMERIC,
+        #     PRIMARY KEY("stadium_id"),
+        #     FOREIGN KEY ("club_id") REFERENCES "clubs"("club_id")
+        #     ON UPDATE CASCADE ON DELETE NO ACTION
+        # );
 
-    #     SELECT AddGeometryColumn('stadiums', 'geom', 3857, 'POINT', 'XY');
+        # SELECT AddGeometryColumn('stadiums', 'geom', 3857, 'POINT', 'XY');
 
-    #     CREATE TABLE IF NOT EXISTS "tickets" (
-    #         "id" INTEGER NOT NULL UNIQUE,
-    #         "club_id" INTEGER NOT NULL,
-    #         "cheapest" TEXT NOT NULL,
-    #         "steapest"  TEXT NOT NULL,
-    #         PRIMARY KEY("id"),
-    #         FOREIGN KEY ("club_id") REFERENCES "clubs"("club_id")
-    #         ON UPDATE CASCADE ON DELETE NO ACTION
-    #     );"""
+        # CREATE TABLE IF NOT EXISTS "tickets" (
+        #     "id" INTEGER NOT NULL UNIQUE,
+        #     "club_id" INTEGER NOT NULL,
+        #     "cheapest" TEXT NOT NULL,
+        #     "steapest"  TEXT NOT NULL,
+        #     PRIMARY KEY("id"),
+        #     FOREIGN KEY ("club_id") REFERENCES "clubs"("club_id")
+        #     ON UPDATE CASCADE ON DELETE NO ACTION
+        # );"""
     # ))
 
-    # Import data
-    clubs.to_sql(name="clubs", con=conn, if_exists="replace", index=False)
-    stadiums.to_sql(name="stadiums", con=conn, if_exists="replace", index=False)
-    tickets.to_sql(name="tickets", con=conn, if_exists="replace", index=False)
+cursor = db.cursor()
 
-    conn.execute("""INSERT INTO stadiums (
-                    stadium_id, name, capacity, opened, closed, longitude,
-                    latitude, GeomFromText('geom', 3857)
-                    ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s);""",
-                        (stadium.stadium_id, stadium.name, stadium.capacity,
-                        stadium.opened, stadium.closed, stadium.longitude,
-                        stadium.latitude, stadium.geom),
+# Import data
+clubs.to_sql(name="clubs", con=conn, if_exists="replace", index=False)
+#stadiums.to_sql(name="stadiums", con=conn, if_exists="replace", index=False)
+tickets.to_sql(name="tickets", con=conn, if_exists="replace", index=False)
 
-    conn.close()
+# Add each row via INSERT INTO
+for stadium in stadiums.itertuples():
+    # sql = """INSERT INTO stadiums (
+    #             stadium_id, name, capacity, opened, closed, longitude,
+    #             latitude, GeomFromText('geom', 3857)
+    #             ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s);""",
+    # (stadium.stadium_id, stadium.name, stadium.capacity,
+    # stadium.opened, stadium.closed, stadium.longitude,
+    # stadium.latitude, stadium.geom)
+
+    cursor.execute("""INSERT INTO stadiums (
+                stadium_id, name, capacity, opened, closed, longitude,
+                latitude, GeomFromText('geom', 3857)
+                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s);""",
+    (stadium.stadium_id, stadium.name, stadium.capacity,
+    stadium.opened, stadium.closed, stadium.longitude,
+    stadium.latitude, stadium.geom))
+
+cursor.close()
+db.close()
+#conn.close()
 
 
