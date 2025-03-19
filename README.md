@@ -1,4 +1,4 @@
-# Premier League Stadiums
+# Premier League Stadiums 🥅⚽
 
 Database of Premier league stadiums
 
@@ -34,7 +34,7 @@ The below database schema documentation was created with the wonderful [drawDB](
 
 | Name        | Type          | Settings                      | References                    | Note                           |
 |-------------|---------------|-------------------------------|-------------------------------|--------------------------------|
-| **id** | INTEGER | 🔑 PK, not null , unique, autoincrement |  | |
+| **club_id** | INTEGER | 🔑 PK, not null , unique, autoincrement |  | |
 | **name** | TEXT | not null  |  | |
 | **established** | TEXT | not null  |  | | 
 
@@ -43,13 +43,14 @@ The below database schema documentation was created with the wonderful [drawDB](
 
 | Name        | Type          | Settings                      | References                    | Note                           |
 |-------------|---------------|-------------------------------|-------------------------------|--------------------------------|
-| **id** | INTEGER | 🔑 PK, not null , unique, autoincrement |  | |
+| **stadium_id** | INTEGER | 🔑 PK, not null , unique, autoincrement |  | |
 | **name** | TEXT | not null  |  | |
-| **peak_capacity** | INTEGER | not null  |  | |
-| **current_capacity** | INTEGER | not null  |  | |
+| **capacity** | INTEGER | not null  |  | |
 | **club_id** | INTEGER | not null  | fk_stadiums_club_id_clubs | |
 | **opened** | TEXT | not null  |  | |
 | **closed** | TEXT | not null  |  | |
+| **longitude** | TEXT | not null |  | |
+| **latitude** | TEXT | not null |  | |
 | **geometry** | TEXT | not null  |  | | 
 
 
@@ -59,41 +60,44 @@ The below database schema documentation was created with the wonderful [drawDB](
 |-------------|---------------|-------------------------------|-------------------------------|--------------------------------|
 | **id** | INTEGER | 🔑 PK, not null , unique, autoincrement |  | |
 | **stadium_id** | INTEGER | not null  | fk_tickets_stadium_id_stadiums | |
-| **season** | TEXT | not null  |  | | 
+| **cheapest** | TEXT | |  | | 
+| **steepest** | TEXT | |  | | 
 
 
 ## Relationships
 
-- **stadiums to clubs**: one_to_many
-- **tickets to stadiums**: one_to_many
+- **stadiums to clubs**: one_to_many (optional)
+- **tickets to stadiums**: one_to_one (optional)
 
 ## Database Diagram
 
 ```mermaid
 erDiagram
-	stadiums ||--o{ clubs : references
-	tickets ||--o{ stadiums : references
+	stadiums ||--o{ clubs : ""
+	tickets ||--o{ stadiums : ""
 
 	clubs {
-		INTEGER id PK
+		INTEGER club_id PK
 		TEXT name
 		TEXT established
 	}
 
 	stadiums {
-		INTEGER id PK
+		INTEGER club_id PK
 		TEXT name
-		INTEGER peak_capacity
-		INTEGER current_capacity
+		INTEGER capacity 
 		INTEGER club_id FK
 		TEXT opened
 		TEXT closed
+		TEXT longitude
+		TEXT latitude
 		TEXT geometry
 	}
 
 	tickets {
 		INTEGER id PK
 		INTEGER stadium_id FK
-		TEXT season
+		TEXT cheapest
+		TEXT steepest
 	}
 ```
