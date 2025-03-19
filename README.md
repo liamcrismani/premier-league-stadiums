@@ -24,10 +24,15 @@ An attempt at creating a geospatial database, just for fun! Only one geometry ty
 
 
 ## Database type
-The below database schema documentation was created with the wonderful [drawDB](https://drawdb.vercel.app/editor) app 😍.  
+The below database schema documentation was created with the wonderful [drawDB](https://drawdb.vercel.app/editor) app 😍. 
+
+> [!Info] Database change
+> Originally this was intended to be a Spatialite database. I found that too difficult; the documentation is archaic and I couldn't get it working. Another time...  
+>   
+> Enter duckDB... 🦆
 
 
-- **Database system:** SQLite with SpatiaLite
+- **Database system:** ~~SQLite with SpatiaLite~~ duckDB
 ## Table structure
 
 ### clubs
