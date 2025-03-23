@@ -19,7 +19,7 @@ An attempt at creating a geospatial database, just for fun! Only one geometry ty
 ### Objectives
 - Create a database of premier league football club stadiums
 - Store stadium location as Points
-- Visualise in Zoho Analytics with tooltips with extra detail (ticket prices, stadium capacity etc)
+- Visualise in Zoho Analytics with tooltips with extra detail (ticket prices, stadium capacity etc). You can see that ultra basic dashboard here https://analytics.zoho.eu/open-view/254652000000052123
 - Have fun
 
 ### Known issues
@@ -30,6 +30,12 @@ An attempt at creating a geospatial database, just for fun! Only one geometry ty
 ### Repo contents
 - `db_create.sql` Postgres and duckdb compliant commands to create the database.
 - `main.py` script to extract, transform, and load the data into a duckdb database `stadiums.db`.
+
+
+### Data sources
+Premier League stadiums were taken from this Wikipedia page: https://en.wikipedia.org/wiki/List_of_Premier_League_stadiums
+
+Information on ticket costs was taken from [this article](https://www.90min.com/posts/2023-24-premier-league-season-ticket-prices), who took the data from [Mat Wasnoom's article in The Athletic](https://www.nytimes.com/athletic/4625027/2023/06/22/premier-league-season-tickets-price-increase-2023-24/).
 
 
 ## Database type
