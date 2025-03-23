@@ -80,6 +80,8 @@ tickets.drop(columns=["name", "club"], axis=1, inplace=True)
 # Create ID column
 tickets.insert(0, "id", range(1, 1+len(tickets)))
 
+stadiums.to_csv('stadiums.csv')
+
 # Create database
 db = sqlite3.connect("stadiums.sqlite")
 
@@ -139,27 +141,21 @@ db = sqlite3.connect("stadiums.sqlite")
 cursor = db.cursor()
 
 # Import data
-clubs.to_sql(name="clubs", con=conn, if_exists="replace", index=False)
+clubs.to_sql(name="clubs", con=db, if_exists="replace", index=False)
 #stadiums.to_sql(name="stadiums", con=conn, if_exists="replace", index=False)
-tickets.to_sql(name="tickets", con=conn, if_exists="replace", index=False)
+tickets.to_sql(name="tickets", con=db, if_exists="replace", index=False)
 
 # Add each row via INSERT INTO
 for stadium in stadiums.itertuples():
-    # sql = """INSERT INTO stadiums (
-    #             stadium_id, name, capacity, opened, closed, longitude,
-    #             latitude, GeomFromText('geom', 3857)
-    #             ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s);""",
-    # (stadium.stadium_id, stadium.name, stadium.capacity,
-    # stadium.opened, stadium.closed, stadium.longitude,
-    # stadium.latitude, stadium.geom)
+    sql = """INSERT INTO stadiums (
+            stadium_id, name, capacity, club_id, opened, closed, longitude,
+            latitude, GeomFromText('geom', 3857)
+            ) VALUES (%d, %s, %s, %d, %s, %s, %s, %s, %s);""" %(stadium.stadium_id,
+            stadium.name, stadium.capacity, stadium.club_id,
+            stadium.opened, stadium.closed, stadium.longitude,
+            stadium.latitude, stadium.geom)
 
-    cursor.execute("""INSERT INTO stadiums (
-                stadium_id, name, capacity, opened, closed, longitude,
-                latitude, GeomFromText('geom', 3857)
-                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s);""",
-    (stadium.stadium_id, stadium.name, stadium.capacity,
-    stadium.opened, stadium.closed, stadium.longitude,
-    stadium.latitude, stadium.geom))
+    cursor.execute(sql)
 
 cursor.close()
 db.close()
