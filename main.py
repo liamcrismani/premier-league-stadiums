@@ -55,6 +55,10 @@ stadiums = gpd.GeoDataFrame(
 
 # Reproject to Web Mercator
 stadiums.to_crs("EPSG:3857")
+stadiums["geometry"] = stadiums["geometry"].to_wkt()
+
+# Output to CSV - DuckDB cannot read GeoDF geometries
+stadiums.to_csv("stadiums.csv")
 
 # Create tickets table
 # Query web page to get list of HTML tables
@@ -74,3 +78,45 @@ tickets.drop(columns=["name", "club"], axis=1, inplace=True)
 tickets.insert(0, "id", range(1, 1+len(tickets)))
 
 # Create database
+con = duckdb.connect("stadiums.db")
+
+# Install and load spatial capabilities
+con.install_extension("spatial")
+con.load_extension("spatial")
+
+# Create tables from DataFrames
+con.sql("START TRANSACTION;")
+con.sql(
+    """CREATE TABLE IF NOT EXISTS clubs AS FROM clubs;
+
+    ALTER TABLE clubs
+    ADD PRIMARY KEY (club_id);
+
+    CREATE TABLE IF NOT EXISTS tickets AS FROM tickets;
+
+    ALTER TABLE tickets
+    ADD PRIMARY KEY (id);
+
+    CREATE TABLE IF NOT EXISTS stadiums AS
+	SELECT
+        stadium_id,
+        name,
+        capacity,
+        club_id,
+        opened,
+        closed,
+        longitude::DOUBLE AS longitude,
+        latitude::DOUBLE AS latitude,
+        ST_GeomFromText(geometry) AS geom
+    FROM "stadiums.csv";
+
+    ALTER TABLE stadiums
+    ADD PRIMARY KEY(stadium_id);
+
+    COMMIT;
+	"""
+)
+
+# Close connection
+con.close()
+
